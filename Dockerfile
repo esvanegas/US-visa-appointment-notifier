@@ -1,5 +1,5 @@
 ARG BUILD_FROM
-FROM $BUILD_FROM
+FROM node:latest
 
 
 RUN apk add --no-cache nodejs-current yarn chromium && \
