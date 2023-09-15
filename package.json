@@ -26,6 +26,7 @@
   "dependencies": {
     "date-fns": "^2.29.2",
     "dotenv": "^16.0.1",
+    "homeassistant": "^0.2.0",
     "mailgun.js": "^8.0.0",
     "puppeteer": "^16.2.0"
   }
