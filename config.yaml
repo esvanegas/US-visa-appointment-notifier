@@ -1,0 +1,11 @@
+name: "US visa appointment notifier"
+description: "Notifies when new US visa appointments ar available"
+version: "1.0.0"
+slug: "us-visa-appointment-notifier"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
