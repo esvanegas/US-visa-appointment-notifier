@@ -7,6 +7,7 @@ const {siteInfo, loginCred, IS_PROD, NEXT_SCHEDULE_POLL, MAX_NUMBER_OF_POLL, NOT
 
 let isLoggedIn = false;
 let maxTries = MAX_NUMBER_OF_POLL
+let latestDate = undefined;
 
 const login = async (page) => {
   logStep('logging in');
@@ -32,8 +33,9 @@ const login = async (page) => {
 const notifyMe = async (earliestDate) => {
   const formattedDate = format(earliestDate, 'MM/dd/yyyy');
   logStep(`sending an email to schedule for ${formattedDate}`);
-  
-  sendHomeAssistantNotification(formattedDate);
+  if(formattedDate !== latestDate){
+	sendHomeAssistantNotification(formattedDate).then(() => latestDate = formattedDate);
+	}
 }
 
 const checkForSchedules = async (page) => {
