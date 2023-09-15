@@ -95,7 +95,7 @@ const process = async (browser) => {
 
 
 (async () => {
-  const browser = await puppeteer.launch(!IS_PROD ? {headless: false}: undefined);
+  const browser = await puppeteer.launch(!IS_PROD ? {headless: false, executablePath: '/usr/bin/chromium-browser'}: undefined);
 
   try{
     await process(browser);
