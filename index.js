@@ -6,7 +6,6 @@ const {delay, logStep, sendHomeAssistantNotification} = require('./utils');
 const {siteInfo, loginCred, IS_PROD, NEXT_SCHEDULE_POLL, MAX_NUMBER_OF_POLL, NOTIFY_ON_DATE_BEFORE} = require('./config');
 
 let isLoggedIn = false;
-let maxTries = MAX_NUMBER_OF_POLL
 let latestDate = undefined;
 
 const login = async (page) => {
@@ -52,7 +51,6 @@ const checkForSchedules = async (page) => {
   });
 
   try{
-    console.log(bodyText);
     const parsedBody =  JSON.parse(bodyText);
 
     if(!Array.isArray(parsedBody)) {
@@ -72,12 +70,6 @@ const checkForSchedules = async (page) => {
 
 
 const process = async (browser) => {
-  logStep(`starting process with ${maxTries} tries left`);
-
-  if(maxTries-- <= 0){
-    console.log('Reached Max tries')
-    return
-  }
 
   const page = await browser.newPage();
 

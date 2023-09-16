@@ -7,6 +7,7 @@ const config = require('./config');
 const mg = mailgun.client({username: 'api', key: config.mailgun.API_KEY});
 const hass = new HomeAssistant(config.hassio)
 
+
 const debug = async (page, logName, saveScreenShot) => {
   if(saveScreenShot){
     await page.screenshot({path: `${logName}.png`});
