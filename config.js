@@ -7,7 +7,8 @@ module.exports = {
   siteInfo: {
     COUNTRY_CODE: process.env.COUNTRY_CODE || 'en-ca',
     SCHEDULE_ID: process.env.SCHEDULE_ID,
-    FACILITY_ID: process.env.FACILITY_ID,
+	FACILITY_ID: process.env.FACILITY_ID,
+	GROUP_ID: process.env.GROUP_ID,
 
     get APPOINTMENTS_JSON_URL(){
       return `https://ais.usvisa-info.com/${this.COUNTRY_CODE}/niv/schedule/${this.SCHEDULE_ID}/appointment/days/${this.FACILITY_ID}.json?appointments%5Bexpedite%5D=false`
@@ -15,8 +16,16 @@ module.exports = {
 
     get LOGIN_URL () {
       return `https://ais.usvisa-info.com/${this.COUNTRY_CODE}/niv/users/sign_in`
-    }
-  },
+	},
+	
+	get HOME_URL() {
+		return `https://ais.usvisa-info.com/${this.COUNTRY_CODE}/niv/groups/${this.GROUP_ID}`
+	},
+
+	get RESCHEDULE_URL() {
+		return `https://ais.usvisa-info.com/${this.COUNTRY_CODE}/niv/schedule/${this.SCHEDULE_ID}/appointment`
+	}
+   },
   IS_PROD: process.env.NODE_ENV === 'prod',
   NEXT_SCHEDULE_POLL: process.env.NEXT_SCHEDULE_POLL || 30_000, // default to 30 seconds
   MAX_NUMBER_OF_POLL: process.env.MAX_NUMBER_OF_POLL || 250, // number of polls before stopping

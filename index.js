@@ -3,7 +3,7 @@ const {parseISO, compareAsc, isBefore, format} = require('date-fns')
 require('dotenv').config();
 
 const {delay, logStep, sendHomeAssistantNotification} = require('./utils');
-const {siteInfo, loginCred, IS_PROD, NEXT_SCHEDULE_POLL, MAX_NUMBER_OF_POLL, NOTIFY_ON_DATE_BEFORE} = require('./config');
+const {siteInfo, loginCred, IS_PROD, NEXT_SCHEDULE_POLL} = require('./config');
 
 let isLoggedIn = false;
 let latestDate = undefined;
@@ -35,6 +35,51 @@ const notifyMe = async (earliestDate) => {
   if(formattedDate !== latestDate){
 	sendHomeAssistantNotification(formattedDate).then(() => latestDate = formattedDate);
 	}
+}
+
+const checkCurrentScheduleDate = async (page) => {
+	await page.setExtraHTTPHeaders({
+    	'Accept': 'application/json, text/javascript, */*; q=0.01',
+    	'X-Requested-With': 'XMLHttpRequest'
+  	});
+	await page.goto(siteInfo.HOME_URL);
+
+	
+	const dateText = await page.evaluate(() => {
+		return document.querySelector(".consular-appt").textContent
+	})
+	const appointmentDate = dateText.split(':')[1].split(',').splice(0, 2).join();
+	const isoDate = new Date(appointmentDate.trim()).toISOString().split('T')[0]
+
+	logStep(`Current appointment: ${isoDate}`)
+
+	return isoDate;
+}
+
+const reschedule = async (page, date) => {
+	await page.setExtraHTTPHeaders({
+    	'Accept': 'application/json, text/javascript, */*; q=0.01',
+    	'X-Requested-With': 'XMLHttpRequest'
+  	});
+	await page.goto(siteInfo.RESCHEDULE_URL);
+	
+	const form = await page.$("form#appointment-form");
+
+	const facilityId = await form.$('select[name="appointments[consulate_appointment][facility_id]"]');
+	const appointmentDate = await form.$('select[name="appointments[consulate_appointment][date]"]');
+	const appointmentTime = await form.$('select[name="appointments[consulate_appointment][time]"]');
+	const rescheduleButton = await form.$('input[name="commit"]');
+
+	await facilityId.type(siteInfo.FACILITY_ID);
+	await appointmentDate.type(date);
+	const fistTimeOption = await page.$$eval('select[name="appointments[consulate_appointment][time]"]', all => all.map(a => a.textContent))[0]
+	await appointmentTime.type(fistTimeOption);
+	await rescheduleButton.click();
+
+	await page.waitForNavigation();
+
+	return true;
+	
 }
 
 const checkForSchedules = async (page) => {
@@ -77,8 +122,9 @@ const process = async (browser) => {
      isLoggedIn = await login(page);
   }
 
+  const currentDate = await checkCurrentScheduleDate(page);
   const earliestDate = await checkForSchedules(page);
-  if(earliestDate && isBefore(earliestDate, parseISO(NOTIFY_ON_DATE_BEFORE))){
+  if(earliestDate && isBefore(earliestDate, parseISO(currentDate))){
     await notifyMe(earliestDate);
   }
 
